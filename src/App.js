@@ -1,25 +1,122 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react"
+import Break from "./components/Break"
+import Session from "./components/Session"
+import TimeLeft from "./components/TimeLeft"
+import { useRef } from "react"
+import { MainWrap, BreakAndSession, Button } from "./components/styledComponents"
 
 function App() {
+  const audioElement = useRef(null)
+  const [currentSessionType, setCurrentSessionType] = useState("Session")
+  const [intervalId, setIntervalId] = useState(null)
+  const [sessionLength, setSessionLength] = useState(60 * 25)
+  const [breakLength, setBreakLength] = useState(300)
+  const [timeLeft, setTimeLeft] = useState(sessionLength)
+  const [disable, setDisable] = useState(false)
+
+  useEffect(() => {
+    setTimeLeft(sessionLength)
+  }, [sessionLength])
+
+  useEffect(() => {
+    if (timeLeft === 0) {
+      audioElement.current.play()
+      if (currentSessionType === "Session") {
+        setCurrentSessionType("Break")
+        setTimeLeft(breakLength)
+      } else if (currentSessionType === "Break") {
+        setCurrentSessionType("Session")
+        setTimeLeft(sessionLength)
+      }
+    }
+  }, [breakLength, currentSessionType, sessionLength, timeLeft])
+
+  const decrementSessionLengthByOneMinute = () => {
+    const newSessionLength = sessionLength - 60
+    if (newSessionLength < 0) {
+      setSessionLength(0)
+    } else {
+      setSessionLength(sessionLength - 60)
+    }
+  }
+  const incrementSessionLengthByOneMinute = () => {
+    setSessionLength(sessionLength + 60)
+  }
+
+  const decrementBreakLengthByOneMinute = () => {
+    const newBreakLength = breakLength - 60
+    if (newBreakLength < 0) {
+      setBreakLength(0)
+    } else {
+      setBreakLength(breakLength - 60)
+    }
+  }
+  const incrementBreakLengthByOneMinute = () => {
+    setBreakLength(breakLength + 60)
+  }
+
+  const isStarted = intervalId !== null
+  const handleStartStopClick = () => {
+    setDisable(prevState => !prevState)
+    if (isStarted) {
+      clearInterval(intervalId)
+      setIntervalId(null)
+    } else {
+      const newIntervalId = setInterval(() => {
+        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1)
+      }, 1000) // TODO: turn back into 1000
+
+      setIntervalId(newIntervalId)
+    }
+  }
+
+  const handleResetButtonClick = () => {
+    setDisable(prevState => !prevState)
+    audioElement.current.load()
+    clearInterval(intervalId)
+    setIntervalId(null)
+    setCurrentSessionType("Session")
+    setSessionLength(60 * 25)
+    setBreakLength(60 * 5)
+    setTimeLeft(60 * 25)
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <MainWrap>
+      <h1>Pomodoro 25 + 5 </h1>
+      <BreakAndSession>
+        <Break
+          breakLength={breakLength}
+          decrementBreakLengthByOneMinute={decrementBreakLengthByOneMinute}
+          incrementBreakLengthByOneMinute={incrementBreakLengthByOneMinute}
+          isDisable={disable}
+        />
+
+
+        <Session
+          sessionLength={sessionLength}
+          decrementSessionLengthByOneMinute={decrementSessionLengthByOneMinute}
+          incrementSessionLengthByOneMinute={incrementSessionLengthByOneMinute}
+          isDisable={disable}
+        />
+      </BreakAndSession>
+      <TimeLeft
+        timerLabel={currentSessionType}
+        handleStartStopClick={handleStartStopClick}
+        startStopButtonLabel={isStarted ? "Stop" : "Start"}
+        timeLeft={timeLeft}
+        triggerDisable={setDisable}
+      />
+
+      <Button onClick={handleResetButtonClick}>Reset</Button>
+      <audio ref={audioElement}>
+        <source
+          src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+          type="audio/wav"
+        />
+      </audio>
+    </MainWrap>
+  )
 }
 
-export default App;
+export default App
