@@ -6,7 +6,11 @@ import { useRef } from "react"
 import {
   MainWrap,
   BreakAndSession,
-  Button
+  Button,
+  CreatorWrapper,
+  WrapIcons,
+  LinkedinIconStyled,
+  GitHubIconStyled
 } from "./components/styledComponents"
 
 function App() {
@@ -36,7 +40,7 @@ function App() {
   }, [breakLength, currentSessionType, sessionLength, timeLeft])
 
   const decrementSessionLengthByOneMinute = (e) => {
-    if(sessionLength === 60) return
+    if (sessionLength === 60) return
     const newSessionLength = sessionLength - 60
     if (newSessionLength < 0) {
       setSessionLength(0)
@@ -44,14 +48,14 @@ function App() {
       setSessionLength(sessionLength - 60)
     }
   }
-  
+
   const incrementSessionLengthByOneMinute = () => {
     setSessionLength(sessionLength + 60)
   }
- 
+
   const decrementBreakLengthByOneMinute = () => {
-    if(breakLength === 60) return
-    
+    if (breakLength === 60) return
+
     const newBreakLength = breakLength - 60
     if (newBreakLength < 0) {
       setBreakLength(0)
@@ -59,7 +63,7 @@ function App() {
       setBreakLength(breakLength - 60)
     }
   }
-  
+
   const incrementBreakLengthByOneMinute = () => {
     setBreakLength(breakLength + 60)
   }
@@ -91,38 +95,56 @@ function App() {
   }
 
   return (
-    <MainWrap>
-      <h1>Pomodoro 25 + 5 </h1>
-      <BreakAndSession>
-        <Session
-          sessionLength={sessionLength}
-          decrementSessionLengthByOneMinute={(e)=> decrementSessionLengthByOneMinute(e)}
-          incrementSessionLengthByOneMinute={incrementSessionLengthByOneMinute}
-          isDisable={disable}
+    <>
+      <MainWrap>
+        <h1>Pomodoro 25 + 5 </h1>
+        <BreakAndSession>
+          <Session
+            sessionLength={sessionLength}
+            decrementSessionLengthByOneMinute={(e) => decrementSessionLengthByOneMinute(e)}
+            incrementSessionLengthByOneMinute={incrementSessionLengthByOneMinute}
+            isDisable={disable}
+          />
+          <Break
+            breakLength={breakLength}
+            decrementBreakLengthByOneMinute={(e) => decrementBreakLengthByOneMinute(e)}
+            incrementBreakLengthByOneMinute={incrementBreakLengthByOneMinute}
+            isDisable={disable}
+          />
+        </BreakAndSession>
+        <TimeLeft
+          timerLabel={currentSessionType}
+          handleStartStopClick={handleStartStopClick}
+          startStopButtonLabel={isStarted ? "Stop" : "Start"}
+          timeLeft={timeLeft}
+          triggerDisable={setDisable}
         />
-        <Break
-          breakLength={breakLength}
-          decrementBreakLengthByOneMinute={(e)=>decrementBreakLengthByOneMinute(e)}
-          incrementBreakLengthByOneMinute={incrementBreakLengthByOneMinute}
-          isDisable={disable}
-        />
-      </BreakAndSession>
-      <TimeLeft
-        timerLabel={currentSessionType}
-        handleStartStopClick={handleStartStopClick}
-        startStopButtonLabel={isStarted ? "Stop" : "Start"}
-        timeLeft={timeLeft}
-        triggerDisable={setDisable}
-      />
 
-      <Button onClick={handleResetButtonClick}>Reset</Button>
-      <audio ref={audioElement}>
-        <source
-          src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
-          type="audio/wav"
-        />
-      </audio>
-    </MainWrap>
+        <Button onClick={handleResetButtonClick}>Reset</Button>
+        <audio ref={audioElement}>
+          <source
+            src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
+            type="audio/wav"
+          />
+        </audio>
+
+      </MainWrap>
+      <CreatorWrapper>
+        <h2>By <span>Juan Pastén Castillo</span></h2>
+        <WrapIcons>
+          <a href="https://github.com/JuanPastenCastillo"
+          target="blank"
+          rel="noreferrer">
+            <GitHubIconStyled />
+          </a>
+          <a href="https://www.linkedin.com/in/juanpastencastillo/"
+          target="blank"
+          rel="noreferrer">
+            <LinkedinIconStyled />
+          </a>
+        </WrapIcons>
+      </CreatorWrapper>
+    </>
   )
 }
 
