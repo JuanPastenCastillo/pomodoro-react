@@ -37,7 +37,7 @@ export const BreakAndSession = styled.div`
     color: snow;
     font-size: 1rem;
     cursor:pointer;
-    border:1px white solid1;
+    border:1px white solid;
   }
   
   & >div > button:hover{

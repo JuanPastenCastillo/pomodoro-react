@@ -3,7 +3,11 @@ import Break from "./components/Break"
 import Session from "./components/Session"
 import TimeLeft from "./components/TimeLeft"
 import { useRef } from "react"
-import { MainWrap, BreakAndSession, Button } from "./components/styledComponents"
+import {
+  MainWrap,
+  BreakAndSession,
+  Button
+} from "./components/styledComponents"
 
 function App() {
   const audioElement = useRef(null)
@@ -31,7 +35,8 @@ function App() {
     }
   }, [breakLength, currentSessionType, sessionLength, timeLeft])
 
-  const decrementSessionLengthByOneMinute = () => {
+  const decrementSessionLengthByOneMinute = (e) => {
+    if(sessionLength === 60) return
     const newSessionLength = sessionLength - 60
     if (newSessionLength < 0) {
       setSessionLength(0)
@@ -39,11 +44,14 @@ function App() {
       setSessionLength(sessionLength - 60)
     }
   }
+  
   const incrementSessionLengthByOneMinute = () => {
     setSessionLength(sessionLength + 60)
   }
-
+ 
   const decrementBreakLengthByOneMinute = () => {
+    if(breakLength === 60) return
+    
     const newBreakLength = breakLength - 60
     if (newBreakLength < 0) {
       setBreakLength(0)
@@ -51,13 +59,14 @@ function App() {
       setBreakLength(breakLength - 60)
     }
   }
+  
   const incrementBreakLengthByOneMinute = () => {
     setBreakLength(breakLength + 60)
   }
 
   const isStarted = intervalId !== null
   const handleStartStopClick = () => {
-    setDisable(prevState => !prevState)
+    setDisable((prevState) => !prevState)
     if (isStarted) {
       clearInterval(intervalId)
       setIntervalId(null)
@@ -71,7 +80,7 @@ function App() {
   }
 
   const handleResetButtonClick = () => {
-    setDisable(prevState => !prevState)
+    setDisable(false)
     audioElement.current.load()
     clearInterval(intervalId)
     setIntervalId(null)
@@ -85,18 +94,16 @@ function App() {
     <MainWrap>
       <h1>Pomodoro 25 + 5 </h1>
       <BreakAndSession>
-        <Break
-          breakLength={breakLength}
-          decrementBreakLengthByOneMinute={decrementBreakLengthByOneMinute}
-          incrementBreakLengthByOneMinute={incrementBreakLengthByOneMinute}
-          isDisable={disable}
-        />
-
-
         <Session
           sessionLength={sessionLength}
-          decrementSessionLengthByOneMinute={decrementSessionLengthByOneMinute}
+          decrementSessionLengthByOneMinute={(e)=> decrementSessionLengthByOneMinute(e)}
           incrementSessionLengthByOneMinute={incrementSessionLengthByOneMinute}
+          isDisable={disable}
+        />
+        <Break
+          breakLength={breakLength}
+          decrementBreakLengthByOneMinute={(e)=>decrementBreakLengthByOneMinute(e)}
+          incrementBreakLengthByOneMinute={incrementBreakLengthByOneMinute}
           isDisable={disable}
         />
       </BreakAndSession>
